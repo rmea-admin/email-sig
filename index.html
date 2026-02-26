@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School of Rock Signature Generator</title>
+    <style>
+        :root { --sor-red: #e31b23; --dark-bg: #1a1a1a; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; background: var(--dark-bg); color: #fff; }
+        .container { display: flex; gap: 40px; max-width: 1200px; margin: auto; align-items: flex-start; }
+        .form-side { background: #fdfdfd; padding: 30px; border-radius: 12px; width: 400px; color: #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h2 { margin-top: 0; border-bottom: 3px solid var(--sor-red); padding-bottom: 10px; text-transform: uppercase; font-size: 1.2rem; }
+        label { display: block; margin-top: 15px; font-size: 0.7rem; font-weight: bold; color: #777; text-transform: uppercase; }
+        input, select { width: 100%; margin: 5px 0; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 1rem; }
+        .preview-side { background: #fff; padding: 40px; border-radius: 12px; flex-grow: 1; color: #333; min-height: 700px; }
+        #signature-result { border: 2px dashed #eee; padding: 20px; background: #fff; margin-top: 20px; min-height: 450px; }
+        .btn-primary { background: var(--sor-red); color: white; border: none; padding: 15px; cursor: pointer; border-radius: 4px; width: 100%; margin-top: 25px; font-weight: bold; text-transform: uppercase; }
+        .btn-admin { background: transparent; color: #888; border: 1px dashed #444; padding: 5px 10px; cursor: pointer; font-size: 0.7rem; float: right; margin-bottom: 10px; border-radius: 4px; }
+        #admin-panel { display: none; background: #fff; color: #333; padding: 25px; border-radius: 12px; position: fixed; top: 10%; left: 50%; transform: translateX(-50%); width: 90%; max-width: 700px; z-index: 1000; box-shadow: 0 0 50px rgba(0,0,0,0.8); max-height: 80vh; overflow-y: auto; }
+        .admin-row { display: grid; grid-template-columns: 120px 1fr; gap: 10px; margin-bottom: 8px; align-items: center; }
+        .overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 999; }
+    </style>
+</head>
+<body>
+
+<button class="btn-admin" onclick="openAdmin()">Admin Settings</button>
+
+<div class="overlay" id="overlay" onclick="closeAdmin()"></div>
+<div id="admin-panel">
+    <h2>Backend Configuration (Password: SOR2026)</h2>
+    <div id="admin-fields"></div>
+    <button class="btn-primary" onclick="saveAdmin()">Save & Sync All Signatures</button>
+</div>
+
+<div class="container">
+    <div class="form-side">
+        <h2>1. Enter Details</h2>
+        <label>Select Profile Type</label>
+        <select id="location" onchange="handleDropdownChange()">
+            <option value="" disabled selected>-- Choose Role/Branch --</option>
+            <optgroup label="School Staff">
+                <option value="Macarthur">Macarthur Staff</option>
+                <option value="BellaVista">Bella Vista Staff</option>
+            </optgroup>
+            <optgroup label="General Inboxes">
+                <option value="MacarthurGeneric">Macarthur Official Inbox</option>
+                <option value="BellaVistaGeneric">Bella Vista Official Inbox</option>
+            </optgroup>
+            <optgroup label="Leadership">
+                <option value="KenMartin">Ken Martin (Director)</option>
+                <option value="AngelaMartin">Angela Martin (Director)</option>
+                <option value="Accounts">Accounts NSW</option>
+            </optgroup>
+        </select>
+
+        <label>Full Name</label>
+        <input type="text" id="name" placeholder="John Smith">
+        <label>Job Title</label>
+        <input type="text" id="title" placeholder="General Manager">
+        <label>Email Address</label>
+        <input type="email" id="email" placeholder="name@schoolofrock.com">
+        <label>Mobile Number</label>
+        <input type="text" id="mobile" placeholder="0400 000 000">
+        <div id="li-container">
+            <label>Personal LinkedIn URL</label>
+            <input type="text" id="linkedin" placeholder="https://linkedin.com/in/username">
+        </div>
+        <button class="btn-primary" onclick="copyToClipboard()">Copy to Clipboard</button>
+    </div>
+
+    <div class="preview-side">
+        <h2>2. Live Preview</h2>
+        <div id="signature-result"></div>
+    </div>
+</div>
+
+<script>
+    const GH_RAW = "https://raw.githubusercontent.com/rmea-admin/email-sig/main/";
+
+    const defaults = {
+        mac: {
+            phone: "+61 2 4628 8000",
+            address: "6 Warby Street, Campbelltown, NSW 2560",
+            map: "https://maps.app.goo.gl/L2a8VA6VxgYvj7BG6",
+            banner: GH_RAW + "Macarthur-Email-Banner.jpg",
+            award25: GH_RAW + "Headliner-Badge-Red-2025.png",
+            award24: GH_RAW + "Headliner-Badge-Red%20(2024).png",
+            companyLi: "https://www.linkedin.com/company/schoolofrockmacarthur"
+        },
+        bv: {
+            phone: "+61 2 9818 1111",
+            address: "B46/ 24-32 Lexington Drive, Bella Vista, NSW 2153",
+            map: "https://maps.google.com/?q=6+Warby+St+Campbelltown",
+            banner: GH_RAW + "BV%20Email-Banner.jpg",
+            award25: GH_RAW + "Headliner-Badge-Red-2025.png",
+            award24: "",
+            companyLi: "https://www.linkedin.com/company/school-of-rock-bella-vista"
+        },
+        hq: {
+            banner: GH_RAW + "MACARTHUR%20%26%20BELLA%20VISTA%20Banner%20-%20non%20headliner.png",
+            accountsPhone: "+61 2 4624 2828"
+        }
+    };
+
+    // Load from memory or use defaults - Version V4 to avoid cache collision
+    let config = JSON.parse(localStorage.getItem('sor_config_v4')) || defaults;
+
+    function handleDropdownChange() {
+        const type = document.getElementById('location').value;
+        // WIPE ALL FIELDS ON DROP CHANGE
+        document.getElementById('name').value = "";
+        document.getElementById('title').value = "";
+        document.getElementById('email').value = "";
+        document.getElementById('mobile').value = "";
+        document.getElementById('linkedin').value = "";
+        
+        document.getElementById('li-container').style.display = type.includes("Generic") ? "none" : "block";
+
+        if (type === "KenMartin") {
+            document.getElementById('name').value = "Ken Martin";
+            document.getElementById('title').value = "Director";
+            document.getElementById('email').value = "kmartin@schoolofrock.com";
+        } else if (type === "AngelaMartin") {
+            document.getElementById('name').value = "Angela Martin";
+            document.getElementById('title').value = "Director";
+            document.getElementById('email').value = "amartin@schoolofrock.com";
+        } else if (type === "Accounts") {
+            document.getElementById('name').value = "Accounts NSW";
+            document.getElementById('title').value = "Finance Department";
+            document.getElementById('email').value = "accounts.nsw@schoolofrock.com";
+        } else if (type.includes("Generic")) {
+            const isMac = type.includes("Macarthur");
+            document.getElementById('name').value = isMac ? "School of Rock Macarthur" : "School of Rock Bella Vista";
+            document.getElementById('email').value = isMac ? "macarthur@schoolofrock.com" : "bellavista@schoolofrock.com";
+            document.getElementById('title').value = "Official Inbox";
+        }
+        render();
+    }
+
+    function formatMobile(num) {
+        if(!num) return "";
+        let cleaned = num.replace(/\D/g, '');
+        if (cleaned.startsWith('0')) cleaned = cleaned.substring(1);
+        return "+61 " + cleaned.slice(0, 3) + " " + cleaned.slice(3, 6) + " " + cleaned.slice(6);
+    }
+
+    function render() {
+        const type = document.getElementById('location').value;
+        if (!type) {
+            document.getElementById('signature-result').innerHTML = "<p style='color:#999; text-align:center; padding-top:100px;'>Select a profile type to start.</p>";
+            return;
+        }
+
+        const name = document.getElementById('name').value || "[Name]";
+        const title = document.getElementById('title').value || "[Title]";
+        const email = document.getElementById('email').value || "[Email]";
+        const mobile = formatMobile(document.getElementById('mobile').value);
+        let personalLi = document.getElementById('linkedin').value;
+
+        const isBV = type.toLowerCase().includes("bella");
+        const isDirector = type.includes("Martin");
+        const branch = isBV ? config.bv : config.mac;
+
+        let banner = (isDirector || type === "Accounts") ? config.hq.banner : branch.banner;
+        let label = isDirector ? "School of Rock | Macarthur, AU | Bella Vista, AU" : 
+                    (type === "Accounts" ? "Finance Department | NSW, AU" : 
+                    (type.includes("Generic") ? "" : (isBV ? "School of Rock Bella Vista, AU" : "School of Rock Macarthur, AU")));
+
+        let contactHtml = '';
+        if (isDirector) {
+            contactHtml = `
+                <tr><td style="padding-top:10px; font-size:13px; color:#333;"><strong>Macarthur</strong> - ${config.mac.phone}</td></tr>
+                <tr><td><a href="${config.mac.map}" style="font-size:12px;color:#666;text-decoration:none;">${config.mac.address}</a></td></tr>
+                <tr><td style="padding-top:8px; font-size:13px; color:#333;"><strong>Bella Vista</strong> - ${config.bv.phone}</td></tr>
+                <tr><td style="padding-bottom:12px;"><a href="${config.bv.map}" style="font-size:12px;color:#666;text-decoration:none;">${config.bv.address}</a></td></tr>
+            `;
+        } else if (type === "Accounts") {
+            contactHtml = `<tr><td style="padding-bottom:12px; font-size:13px; color:#333;"><img src="https://cdn-icons-png.flaticon.com/32/455/455705.png" width="12" style="margin-right:8px;vertical-align:middle;"><span>${config.hq.accountsPhone}</span></td></tr>`;
+        } else {
+            contactHtml = `
+                <tr><td style="padding-bottom:3px; font-size:13px; color:#333;"><img src="https://cdn-icons-png.flaticon.com/32/455/455705.png" width="12" style="margin-right:8px;vertical-align:middle;"><span>${branch.phone}</span></td></tr>
+                <tr><td style="padding-bottom:12px; font-size:13px; color:#333;"><img src="https://cdn-icons-png.flaticon.com/32/484/484167.png" width="12" style="margin-right:8px;vertical-align:middle;"><a href="${branch.map}" target="_blank" style="font-size:13px;color:#666;text-decoration:none;">${branch.address}</a></td></tr>
+            `;
+        }
+
+        let finalLi = personalLi || branch.companyLi;
+        let fb = isBV ? "schoolofrockbellavista" : "schoolofrockmacarthur";
+        let ig = isBV ? "schoolofrockbellavista" : "schoolofrockmacarthur";
+        let tt = isBV ? "sorbellavista" : "schoolofrockmacarthur";
+
+        let awardHtml = '';
+        if (branch.award25) awardHtml += `<td><img src="${branch.award25}" height="100" style="display:block;"></td>`;
+        if (branch.award24 && type !== "Accounts") {
+            awardHtml += `<td style="padding-left:10px;"><img src="${branch.award24}" height="100" style="display:block;"></td>`;
+        }
+
+        const html = `
+            <table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,sans-serif;line-height:1.4;color:#333;width:450px;background-color:#ffffff; text-align: left;">
+                <tr><td style="padding-bottom:10px;"><span style="font-size:18px;font-weight:bold;color:#e31b23;text-transform:uppercase;">${name}</span><br><span style="font-size:14px;font-weight:bold;color:#000;">${title}</span><br><span style="font-size:13px;color:#888;font-style:italic;">${label}</span></td></tr>
+                <tr><td><table cellpadding="0" cellspacing="0" border="0">
+                    <tr><td style="padding-bottom:3px;"><img src="https://cdn-icons-png.flaticon.com/32/542/542689.png" width="12" style="margin-right:8px;vertical-align:middle;"><a href="mailto:${email}" style="font-size:13px;color:#333;text-decoration:none;">${email}</a></td></tr>
+                    ${mobile ? `<tr><td style="padding-bottom:3px;"><img src="https://cdn-icons-png.flaticon.com/32/15/15874.png" width="12" style="margin-right:8px;vertical-align:middle;"><span>${mobile}</span></td></tr>` : ''}
+                    ${contactHtml}
+                </table></td></tr>
+                <tr><td style="padding-bottom:15px; padding-top:10px;"><table cellpadding="0" cellspacing="0" border="0"><tr><td>
+                    ${finalLi ? `<a href="${finalLi}" target="_blank" style="margin-right:8px; text-decoration:none;"><img src="https://cdn-icons-png.flaticon.com/32/174/174857.png" width="22"></a>` : ''}
+                    <a href="https://facebook.com/${fb}" target="_blank" style="margin-right:8px;"><img src="https://cdn-icons-png.flaticon.com/32/733/733547.png" width="22"></a>
+                    <a href="https://instagram.com/${ig}" target="_blank" style="margin-right:8px;"><img src="https://cdn-icons-png.flaticon.com/32/2111/2111463.png" width="22"></a>
+                    <a href="https://tiktok.com/@${tt}" target="_blank"><img src="https://cdn-icons-png.flaticon.com/32/3046/3046121.png" width="22"></a>
+                </td></tr></table></td></tr>
+                <tr><td><img src="${banner}" width="450" style="display:block; width:450px; border-radius:4px; border:1px solid #eee;"></td></tr>
+                <tr><td style="padding-top:15px;"><table cellpadding="0" cellspacing="0" border="0"><tr>${awardHtml}</tr></table></td></tr>
+            </table>`;
+
+        document.getElementById('signature-result').innerHTML = html;
+    }
+
+    function openAdmin() {
+        const pw = prompt("Admin Password:");
+        if (pw === "SOR2026") {
+            document.getElementById('overlay').style.display = "block";
+            document.getElementById('admin-panel').style.display = "block";
+            buildAdminUI();
+        }
+    }
+
+    function buildAdminUI() {
+        let html = '';
+        ['mac', 'bv', 'hq'].forEach(sec => {
+            html += `<h3>${sec.toUpperCase()}</h3>`;
+            for (let key in config[sec]) {
+                html += `<div class="admin-row"><label>${key}</label><input type="text" id="admin-${sec}-${key}" value="${config[sec][key]}"></div>`;
+            }
+        });
+        document.getElementById('admin-fields').innerHTML = html;
+    }
+
+    function saveAdmin() {
+        ['mac', 'bv', 'hq'].forEach(sec => {
+            for (let key in config[sec]) {
+                config[sec][key] = document.getElementById(`admin-${sec}-${key}`).value;
+            }
+        });
+        localStorage.setItem('sor_config_v4', JSON.stringify(config));
+        closeAdmin();
+        render();
+    }
+
+    function closeAdmin() {
+        document.getElementById('overlay').style.display = "none";
+        document.getElementById('admin-panel').style.display = "none";
+    }
+
+    document.querySelectorAll('input').forEach(i => i.oninput = render);
+    
+    function copyToClipboard() {
+        const el = document.getElementById("signature-result");
+        const range = document.createRange();
+        range.selectNode(el);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        document.execCommand("copy");
+        alert("Rockstar Signature Copied!");
+    }
+</script>
+</body>
+</html>
