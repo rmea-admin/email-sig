@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Brand Signature Generator</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; background: #f0f2f5; color: #333; }
+        .container { display: flex; gap: 40px; max-width: 1100px; margin: auto; }
+        .form-side { background: white; padding: 30px; border-radius: 12px; width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .preview-side { background: white; padding: 30px; border-radius: 12px; flex-grow: 1; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h2 { margin-top: 0; color: #1a1a1a; font-size: 1.2rem; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        label { display: block; margin-top: 15px; font-size: 0.85rem; font-weight: bold; color: #666; }
+        input, select { width: 100%; margin: 5px 0; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { background: #1a1a1a; color: white; border: none; padding: 12px 20px; cursor: pointer; border-radius: 6px; width: 100%; margin-top: 20px; font-weight: bold; transition: background 0.2s; }
+        button:hover { background: #333; }
+        #signature-result { border: 1px solid #eee; padding: 20px; margin-top: 20px; min-height: 200px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="form-side">
+        <h2>1. Your Details</h2>
+        <label>Full Name</label>
+        <input type="text" id="name" placeholder="Jane Doe" oninput="generate()">
+        
+        <label>Job Title</label>
+        <input type="text" id="title" placeholder="Marketing Manager" oninput="generate()">
+        
+        <label>Email Address</label>
+        <input type="email" id="email" placeholder="jane@company.com" oninput="generate()">
+        
+        <label>Mobile Number (Optional)</label>
+        <input type="text" id="mobile" placeholder="+44 7700 900000" oninput="generate()">
+
+        <label>Personal LinkedIn URL</label>
+        <input type="text" id="linkedin" placeholder="https://linkedin.com/in/username" oninput="generate()">
+        
+        <label>Office Location</label>
+        <select id="location" onchange="generate()">
+            <option value="London">London HQ</option>
+            <option value="NewYork">New York Office</option>
+        </select>
+        
+        <button onclick="copyToClipboard()">Copy to Clipboard</button>
+    </div>
+
+    <div class="preview-side">
+        <h2>2. Live Preview</h2>
+        <div id="signature-result">
+            </div>
+        <p style="font-size: 0.8rem; color: #999; margin-top: 15px;">* Social icons below the banner link to your specific branch pages.</p>
+    </div>
+</div>
+
+<script>
+    // Configuration for Branch-Specific Social Media
+    const locations = {
+        "London": {
+            address: "123 Soho Square, London, W1D 3QP",
+            map: "https://goo.gl/maps/london-link",
+            phone: "+44 20 7946 0000",
+            instagram: "https://instagram.com/company_london",
+            facebook: "https://facebook.com/company_london",
+            tiktok: "https://tiktok.com/@company_london"
+        },
+        "NewYork": {
+            address: "456 Madison Ave, New York, NY 10022",
+            map: "https://goo.gl/maps/ny-link",
+            phone: "+1 212-555-0123",
+            instagram: "https://instagram.com/company_ny",
+            facebook: "https://facebook.com/company_ny",
+            tiktok: "https://tiktok.com/@company_ny"
+        }
+    };
+
+    function generate() {
+        const name = document.getElementById('name').value || "Full Name";
+        const title = document.getElementById('title').value || "Job Title";
+        const email = document.getElementById('email').value || "email@company.com";
+        const mobile = document.getElementById('mobile').value;
+        const linkedin = document.getElementById('linkedin').value;
+        const locKey = document.getElementById('location').value;
+        const locData = locations[locKey];
+
+        // Logic for optional mobile row
+        let mobileRow = mobile ? `
+            <tr>
+                <td style="padding-bottom: 4px;">
+                    <img src="https://cdn-icons-png.flaticon.com/32/15/15874.png" width="14" style="vertical-align: middle; margin-right: 8px;">
+                    <span style="font-size: 13px; color: #444;">${mobile}</span>
+                </td>
+            </tr>` : '';
+
+        // Logic for personal LinkedIn icon
+        let linkedinIcon = linkedin ? `
+            <a href="${linkedin}" style="text-decoration:none; margin-right:10px;">
+                <img src="https://cdn-icons-png.flaticon.com/32/174/174857.png" width="24" alt="LinkedIn">
+            </a>` : '';
+
+        const template = `
+            <table cellpadding="0" cellspacing="0" style="font-family: Arial, sans-serif; color: #333; line-height: 1.4; min-width: 400px;">
+                <tr>
+                    <td style="padding-bottom: 12px;">
+                        <span style="font-size: 18px; font-weight: bold; color: #000; display: block;">${name}</span>
+                        <span style="font-size: 14px; color: #666; display: block;">${title}</span>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <table cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td style="padding-bottom: 4px;">
+                                    <img src="https://cdn-icons-png.flaticon.com/32/542/542689.png" width="14" style="vertical-align: middle; margin-right: 8px;">
+                                    <a href="mailto:${email}" style="font-size: 13px; color: #007bff; text-decoration: none;">${email}</a>
+                                </td>
+                            </tr>
+                            ${mobileRow}
+                            <tr>
+                                <td style="padding-bottom: 4px;">
+                                    <img src="https://cdn-icons-png.flaticon.com/32/455/455705.png" width="14" style="vertical-align: middle; margin-right: 8px;">
+                                    <span style="font-size: 13px; color: #444;">${locData.phone}</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <img src="https://cdn-icons-png.flaticon.com/32/484/484167.png" width="14" style="vertical-align: middle; margin-right: 8px;">
+                                    <a href="${locData.map}" style="font-size: 13px; color: #666; text-decoration: none;">${locData.address}</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="padding-top: 20px;">
+                        <img src="https://via.placeholder.com/450x100.png?text=YOUR+BRAND+BANNER+HERE" width="450" style="display: block; border-radius: 4px;">
+                    </td>
+                </tr>
+
+                <tr>
+                    <td style="padding-top: 15px;">
+                        <table width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td>
+                                    ${linkedinIcon}
+                                    <a href="${locData.instagram}" style="text-decoration:none; margin-right:10px;"><img src="https://cdn-icons-png.flaticon.com/32/2111/2111463.png" width="24" alt="Instagram"></a>
+                                    <a href="${locData.facebook}" style="text-decoration:none; margin-right:10px;"><img src="https://cdn-icons-png.flaticon.com/32/733/733547.png" width="24" alt="Facebook"></a>
+                                    <a href="${locData.tiktok}" style="text-decoration:none;"><img src="https://cdn-icons-png.flaticon.com/32/3046/3046121.png" width="24" alt="TikTok"></a>
+                                </td>
+                                <td align="right">
+                                    <img src="https://via.placeholder.com/40x40.png?text=W1" style="margin-left:8px;">
+                                    <img src="https://via.placeholder.com/40x40.png?text=W2" style="margin-left:8px;">
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        `;
+
+        document.getElementById('signature-result').innerHTML = template;
+    }
+
+    function copyToClipboard() {
+        const el = document.getElementById("signature-result");
+        const range = document.createRange();
+        range.selectNode(el);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        try {
+            document.execCommand("copy");
+            alert("Signature copied! Paste it into Gmail Settings.");
+        } catch (err) {
+            alert("Oops, unable to copy.");
+        }
+    }
+
+    generate(); // Initialize
+</script>
+
+</body>
+</html>
