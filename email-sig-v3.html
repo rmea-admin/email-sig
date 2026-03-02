@@ -2,47 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>School of Rock Signature Generator</title>
+    <title>School of Rock Master Generator v2.5</title>
     <style>
-        :root { --sor-red: #e31b23; --dark-bg: #1a1a1a; }
-        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; background: var(--dark-bg); color: #fff; }
-        .container { display: flex; gap: 40px; max-width: 1200px; margin: auto; align-items: flex-start; }
-        .form-side { background: #fdfdfd; padding: 30px; border-radius: 12px; width: 400px; color: #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h2 { margin-top: 0; border-bottom: 3px solid var(--sor-red); padding-bottom: 10px; text-transform: uppercase; font-size: 1.2rem; }
-        label { display: block; margin-top: 15px; font-size: 0.7rem; font-weight: bold; color: #777; text-transform: uppercase; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 40px; background: #1a1a1a; color: #fff; }
+        .container { display: flex; gap: 40px; max-width: 1250px; margin: auto; align-items: flex-start; }
+        .form-side { background: #fdfdfd; padding: 30px; border-radius: 12px; width: 420px; color: #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: sticky; top: 40px; }
+        .preview-side { flex-grow: 1; color: #333; min-width: 500px; }
+        .window-box { background: #fff; padding: 30px; border-radius: 12px; margin-bottom: 30px; }
+        h2 { margin-top: 0; border-bottom: 3px solid #e31b23; padding-bottom: 10px; text-transform: uppercase; font-size: 1.4rem; color: #000; }
+        label { display: block; margin-top: 15px; font-size: 0.75rem; font-weight: bold; color: #777; text-transform: uppercase; }
         input, select { width: 100%; margin: 5px 0; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 1rem; }
-        .preview-side { background: #fff; padding: 40px; border-radius: 12px; flex-grow: 1; color: #333; min-height: 700px; }
-        #signature-result { border: 2px dashed #eee; padding: 20px; background: #fff; margin-top: 20px; min-height: 450px; }
-        .btn-primary { background: var(--sor-red); color: white; border: none; padding: 15px; cursor: pointer; border-radius: 4px; width: 100%; margin-top: 25px; font-weight: bold; text-transform: uppercase; }
-        .btn-admin { background: transparent; color: #888; border: 1px dashed #444; padding: 5px 10px; cursor: pointer; font-size: 0.7rem; float: right; margin-bottom: 10px; border-radius: 4px; }
-        #admin-panel { display: none; background: #fff; color: #333; padding: 25px; border-radius: 12px; position: fixed; top: 10%; left: 50%; transform: translateX(-50%); width: 90%; max-width: 700px; z-index: 1000; box-shadow: 0 0 50px rgba(0,0,0,0.8); max-height: 80vh; overflow-y: auto; }
-        .admin-row { display: grid; grid-template-columns: 120px 1fr; gap: 10px; margin-bottom: 8px; align-items: center; }
-        .overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); z-index: 999; }
+        .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 25px; }
+        .btn-primary { background: #e31b23; color: white; border: none; padding: 15px; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 1.1rem; text-transform: uppercase; }
+        .btn-hubspot { background: #ff7a59; color: white; border: none; padding: 15px; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 1.1rem; text-transform: uppercase; }
+        #signature-result { border: 2px dashed #ddd; padding: 20px; margin-top: 20px; background-color: #fff; min-height: 350px; display: flex; justify-content: flex-start; }
+        .instruction-list { padding-left: 20px; line-height: 1.6; color: #444; }
+        .instruction-list li { margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<button class="btn-admin" onclick="openAdmin()">Admin Settings</button>
-
-<div class="overlay" id="overlay" onclick="closeAdmin()"></div>
-<div id="admin-panel">
-    <h2>Backend Configuration (Password: SOR2026)</h2>
-    <div id="admin-fields"></div>
-    <button class="btn-primary" onclick="saveAdmin()">Save & Sync All Signatures</button>
-</div>
-
 <div class="container">
     <div class="form-side">
-        <h2>1. Enter Details</h2>
-        <label>Select Profile Type</label>
+        <h2>1. Rockstar Details</h2>
         <select id="location" onchange="handleDropdownChange()">
-            <option value="" disabled selected>-- Choose Role/Branch --</option>
+            <option value="" disabled selected>-- Choose Location --</option>
             <optgroup label="School Staff">
                 <option value="Macarthur">Macarthur Staff</option>
                 <option value="BellaVista">Bella Vista Staff</option>
             </optgroup>
-            <optgroup label="General Inboxes">
+            <optgroup label="Generic Inbox">
                 <option value="MacarthurGeneric">Macarthur Official Inbox</option>
                 <option value="BellaVistaGeneric">Bella Vista Official Inbox</option>
             </optgroup>
@@ -52,216 +41,160 @@
                 <option value="Accounts">Accounts NSW</option>
             </optgroup>
         </select>
-
         <label>Full Name</label>
-        <input type="text" id="name" placeholder="John Smith">
+        <input type="text" id="name" placeholder="Name">
         <label>Job Title</label>
-        <input type="text" id="title" placeholder="General Manager">
+        <input type="text" id="title" placeholder="Title">
         <label>Email Address</label>
-        <input type="email" id="email" placeholder="name@schoolofrock.com">
+        <input type="email" id="email" placeholder="email@schoolofrock.com">
         <label>Mobile Number</label>
-        <input type="text" id="mobile" placeholder="0400 000 000">
-        <div id="li-container">
-            <label>Personal LinkedIn URL</label>
-            <input type="text" id="linkedin" placeholder="https://linkedin.com/in/username">
+        <input type="text" id="mobile" placeholder="e.g. 0412 345 678" oninput="render()">
+        <label>LinkedIn URL</label>
+        <input type="text" id="linkedin" placeholder="LinkedIn URL">
+        <div class="btn-group">
+            <button class="btn-primary" onclick="copyVisual()">Copy for Gmail</button>
+            <button class="btn-hubspot" onclick="copyForHubSpot()">Copy for HubSpot Format</button>
         </div>
-        <button class="btn-primary" onclick="copyToClipboard()">Copy to Clipboard</button>
     </div>
-
     <div class="preview-side">
-        <h2>2. Live Preview</h2>
-        <div id="signature-result"></div>
+        <div class="window-box">
+            <h2>2. Live Preview</h2>
+            <div id="signature-result"></div>
+        </div>
+        <div class="window-box">
+            <h2>3. HubSpot Setup Guide</h2>
+            <ol class="instruction-list">
+                <li>Click <strong>"Copy for HubSpot Format"</strong>.</li>
+                <li>In HubSpot, go to <strong>Settings > General > Email</strong>.</li>
+                <li>Click <strong>Edit email signature</strong>.</li>
+                <li>Switch to the <strong>Source Code (<>)</strong> view.</li>
+                <li>Clear the box and <strong>Paste</strong> the code.</li>
+                <li>Click <strong>Save</strong>.</li>
+            </ol>
+        </div>
     </div>
 </div>
 
 <script>
     const GH_RAW = "https://raw.githubusercontent.com/rmea-admin/email-sig/main/";
-
-    const defaults = {
+    const config = {
         mac: {
             phone: "+61 2 4628 8000",
             address: "6 Warby Street, Campbelltown, NSW 2560",
-            map: "https://maps.app.goo.gl/L2a8VA6VxgYvj7BG6",
             banner: GH_RAW + "Macarthur-Email-Banner.jpg",
             award25: GH_RAW + "Headliner-Badge-Red-2025.png",
             award24: GH_RAW + "Headliner-Badge-Red%20(2024).png",
-            companyLi: "https://www.linkedin.com/company/schoolofrockmacarthur"
+            fb: "schoolofrockmacarthur", ig: "schoolofrockmacarthur", tt: "schoolofrockmacarthur",
+            li: "https://www.linkedin.com/company/schoolofrockmacarthur"
         },
         bv: {
             phone: "+61 2 9818 1111",
-            address: "B46/ 24-32 Lexington Drive, Bella Vista, NSW 2153",
-            map: "https://maps.google.com/?q=6+Warby+St+Campbelltown",
+            address: "24-32 Lexington Drive, Bella Vista, NSW 2153",
             banner: GH_RAW + "BV%20Email-Banner.jpg",
             award25: GH_RAW + "Headliner-Badge-Red-2025.png",
-            award24: "",
-            companyLi: "https://www.linkedin.com/company/school-of-rock-bella-vista"
+            award24: "", 
+            fb: "schoolofrockbellavista", ig: "schoolofrockbellavista", tt: "sorbellavista",
+            li: "https://www.linkedin.com/company/school-of-rock-bella-vista"
         },
         hq: {
-            banner: GH_RAW + "MACARTHUR%20%26%20BELLA%20VISTA%20Banner%20-%20non%20headliner.png",
-            accountsPhone: "+61 2 4624 2828"
+            banner: GH_RAW + "MACARTHUR%20%26%20BELLA%20VISTA%20Banner%20-%20non%20headliner.png"
         }
     };
 
-    // Load from memory or use defaults - Version V4 to avoid cache collision
-    let config = JSON.parse(localStorage.getItem('sor_config_v4')) || defaults;
+    function formatInternationalMobile(val) {
+        if (!val) return "";
+        let cleaned = val.replace(/\D/g, '');
+        if (cleaned.startsWith('61')) cleaned = cleaned.substring(2);
+        if (cleaned.startsWith('0')) cleaned = cleaned.substring(1);
+        if (cleaned.length === 9) {
+            return `+61 ${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6)}`;
+        }
+        return val;
+    }
 
     function handleDropdownChange() {
         const type = document.getElementById('location').value;
-        // WIPE ALL FIELDS ON DROP CHANGE
-        document.getElementById('name').value = "";
-        document.getElementById('title').value = "";
-        document.getElementById('email').value = "";
-        document.getElementById('mobile').value = "";
-        document.getElementById('linkedin').value = "";
-        
-        document.getElementById('li-container').style.display = type.includes("Generic") ? "none" : "block";
-
+        const f = (id) => document.getElementById(id);
+        f('name').value = ""; f('title').value = ""; f('email').value = ""; f('linkedin').value = ""; f('mobile').value = "";
         if (type === "KenMartin") {
-            document.getElementById('name').value = "Ken Martin";
-            document.getElementById('title').value = "Director";
-            document.getElementById('email').value = "kmartin@schoolofrock.com";
+            f('name').value = "Ken Martin"; f('title').value = "Director"; f('email').value = "kmartin@schoolofrock.com";
+            f('linkedin').value = "https://www.linkedin.com/in/kennymartint/";
         } else if (type === "AngelaMartin") {
-            document.getElementById('name').value = "Angela Martin";
-            document.getElementById('title').value = "Director";
-            document.getElementById('email').value = "amartin@schoolofrock.com";
+            f('name').value = "Angela Martin"; f('title').value = "Director"; f('email').value = "amartin@schoolofrock.com";
         } else if (type === "Accounts") {
-            document.getElementById('name').value = "Accounts NSW";
-            document.getElementById('title').value = "Finance Department";
-            document.getElementById('email').value = "accounts.nsw@schoolofrock.com";
+            f('name').value = "Accounts NSW"; f('title').value = "Finance Department"; f('email').value = "accounts.nsw@schoolofrock.com";
         } else if (type.includes("Generic")) {
-            const isMac = type.includes("Macarthur");
-            document.getElementById('name').value = isMac ? "School of Rock Macarthur" : "School of Rock Bella Vista";
-            document.getElementById('email').value = isMac ? "macarthur@schoolofrock.com" : "bellavista@schoolofrock.com";
-            document.getElementById('title').value = "Official Inbox";
+            f('name').value = type.includes("Macarthur") ? "School of Rock Macarthur" : "School of Rock Bella Vista";
+            f('email').value = type.includes("Macarthur") ? "macarthur@schoolofrock.com" : "bellavista@schoolofrock.com";
+            f('title').value = "Official Inbox";
         }
         render();
-    }
-
-    function formatMobile(num) {
-        if(!num) return "";
-        let cleaned = num.replace(/\D/g, '');
-        if (cleaned.startsWith('0')) cleaned = cleaned.substring(1);
-        return "+61 " + cleaned.slice(0, 3) + " " + cleaned.slice(3, 6) + " " + cleaned.slice(6);
     }
 
     function render() {
         const type = document.getElementById('location').value;
-        if (!type) {
-            document.getElementById('signature-result').innerHTML = "<p style='color:#999; text-align:center; padding-top:100px;'>Select a profile type to start.</p>";
-            return;
-        }
-
+        if (!type) return;
         const name = document.getElementById('name').value || "[Name]";
         const title = document.getElementById('title').value || "[Title]";
         const email = document.getElementById('email').value || "[Email]";
-        const mobile = formatMobile(document.getElementById('mobile').value);
-        let personalLi = document.getElementById('linkedin').value;
+        const mobile = formatInternationalMobile(document.getElementById('mobile').value);
+        const personalLi = document.getElementById('linkedin').value;
+        const isDirector = type.includes("Martin") || type === "Accounts";
+        const branch = type.includes("BellaVista") ? config.bv : config.mac;
+        const banner = isDirector ? config.hq.banner : branch.banner;
 
-        const isBV = type.toLowerCase().includes("bella");
-        const isDirector = type.includes("Martin");
-        const branch = isBV ? config.bv : config.mac;
+        let contactInfo = isDirector ? 
+            `<tr><td style="font-size:12px; color:#333; padding-top:5px;"><strong>Macarthur:</strong> ${config.mac.phone} | ${config.mac.address}</td></tr>
+             <tr><td style="font-size:12px; color:#333; padding-top:2px;"><strong>Bella Vista:</strong> ${config.bv.phone} | ${config.bv.address}</td></tr>` :
+            `<tr><td style="font-size:13px; color:#333; padding-top:2px;"><img src="https://cdn-icons-png.flaticon.com/32/455/455705.png" width="12" height="12" style="margin-right:8px;vertical-align:middle;">${branch.phone}</td></tr>
+             <tr><td style="font-size:12px; color:#666; padding-top:2px;"><img src="https://cdn-icons-png.flaticon.com/32/484/484167.png" width="12" height="12" style="margin-right:8px;vertical-align:middle;">${branch.address}</td></tr>`;
 
-        let banner = (isDirector || type === "Accounts") ? config.hq.banner : branch.banner;
-        let label = isDirector ? "School of Rock | Macarthur, AU | Bella Vista, AU" : 
-                    (type === "Accounts" ? "Finance Department | NSW, AU" : 
-                    (type.includes("Generic") ? "" : (isBV ? "School of Rock Bella Vista, AU" : "School of Rock Macarthur, AU")));
-
-        let contactHtml = '';
-        if (isDirector) {
-            contactHtml = `
-                <tr><td style="padding-top:10px; font-size:13px; color:#333;"><strong>Macarthur</strong> - ${config.mac.phone}</td></tr>
-                <tr><td><a href="${config.mac.map}" style="font-size:12px;color:#666;text-decoration:none;">${config.mac.address}</a></td></tr>
-                <tr><td style="padding-top:8px; font-size:13px; color:#333;"><strong>Bella Vista</strong> - ${config.bv.phone}</td></tr>
-                <tr><td style="padding-bottom:12px;"><a href="${config.bv.map}" style="font-size:12px;color:#666;text-decoration:none;">${config.bv.address}</a></td></tr>
-            `;
-        } else if (type === "Accounts") {
-            contactHtml = `<tr><td style="padding-bottom:12px; font-size:13px; color:#333;"><img src="https://cdn-icons-png.flaticon.com/32/455/455705.png" width="12" style="margin-right:8px;vertical-align:middle;"><span>${config.hq.accountsPhone}</span></td></tr>`;
-        } else {
-            contactHtml = `
-                <tr><td style="padding-bottom:3px; font-size:13px; color:#333;"><img src="https://cdn-icons-png.flaticon.com/32/455/455705.png" width="12" style="margin-right:8px;vertical-align:middle;"><span>${branch.phone}</span></td></tr>
-                <tr><td style="padding-bottom:12px; font-size:13px; color:#333;"><img src="https://cdn-icons-png.flaticon.com/32/484/484167.png" width="12" style="margin-right:8px;vertical-align:middle;"><a href="${branch.map}" target="_blank" style="font-size:13px;color:#666;text-decoration:none;">${branch.address}</a></td></tr>
-            `;
+        let awardHtml = `<td><img src="${branch.award25}" width="80" height="80" style="display:block;border:0;"></td>`;
+        if (config.mac.award24 && (type.includes("Macarthur") || isDirector)) {
+            awardHtml += `<td style="padding-left:10px;"><img src="${config.mac.award24}" width="80" height="80" style="display:block;border:0;"></td>`;
         }
 
-        let finalLi = personalLi || branch.companyLi;
-        let fb = isBV ? "schoolofrockbellavista" : "schoolofrockmacarthur";
-        let ig = isBV ? "schoolofrockbellavista" : "schoolofrockmacarthur";
-        let tt = isBV ? "sorbellavista" : "schoolofrockmacarthur";
-
-        let awardHtml = '';
-        if (branch.award25) awardHtml += `<td><img src="${branch.award25}" height="100" style="display:block;"></td>`;
-        if (branch.award24 && type !== "Accounts") {
-            awardHtml += `<td style="padding-left:10px;"><img src="${branch.award24}" height="100" style="display:block;"></td>`;
-        }
-
-        const html = `
-            <table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,sans-serif;line-height:1.4;color:#333;width:450px;background-color:#ffffff; text-align: left;">
-                <tr><td style="padding-bottom:10px;"><span style="font-size:18px;font-weight:bold;color:#e31b23;text-transform:uppercase;">${name}</span><br><span style="font-size:14px;font-weight:bold;color:#000;">${title}</span><br><span style="font-size:13px;color:#888;font-style:italic;">${label}</span></td></tr>
-                <tr><td><table cellpadding="0" cellspacing="0" border="0">
-                    <tr><td style="padding-bottom:3px;"><img src="https://cdn-icons-png.flaticon.com/32/542/542689.png" width="12" style="margin-right:8px;vertical-align:middle;"><a href="mailto:${email}" style="font-size:13px;color:#333;text-decoration:none;">${email}</a></td></tr>
-                    ${mobile ? `<tr><td style="padding-bottom:3px;"><img src="https://cdn-icons-png.flaticon.com/32/15/15874.png" width="12" style="margin-right:8px;vertical-align:middle;"><span>${mobile}</span></td></tr>` : ''}
-                    ${contactHtml}
-                </table></td></tr>
-                <tr><td style="padding-bottom:15px; padding-top:10px;"><table cellpadding="0" cellspacing="0" border="0"><tr><td>
-                    ${finalLi ? `<a href="${finalLi}" target="_blank" style="margin-right:8px; text-decoration:none;"><img src="https://cdn-icons-png.flaticon.com/32/174/174857.png" width="22"></a>` : ''}
-                    <a href="https://facebook.com/${fb}" target="_blank" style="margin-right:8px;"><img src="https://cdn-icons-png.flaticon.com/32/733/733547.png" width="22"></a>
-                    <a href="https://instagram.com/${ig}" target="_blank" style="margin-right:8px;"><img src="https://cdn-icons-png.flaticon.com/32/2111/2111463.png" width="22"></a>
-                    <a href="https://tiktok.com/@${tt}" target="_blank"><img src="https://cdn-icons-png.flaticon.com/32/3046/3046121.png" width="22"></a>
-                </td></tr></table></td></tr>
-                <tr><td><img src="${banner}" width="450" style="display:block; width:450px; border-radius:4px; border:1px solid #eee;"></td></tr>
-                <tr><td style="padding-top:15px;"><table cellpadding="0" cellspacing="0" border="0"><tr>${awardHtml}</tr></table></td></tr>
-            </table>`;
-
+        const html = `<table cellpadding="0" cellspacing="0" border="0" style="font-family:Arial,sans-serif;width:450px;border-collapse:collapse;text-align:left;">
+            <tr><td style="padding-bottom:8px;"><span style="font-size:18px;font-weight:bold;color:#e31b23;text-transform:uppercase;">${name}</span><br><span style="font-size:14px;font-weight:bold;color:#000;">${title}</span></td></tr>
+            <tr><td><table cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                <tr><td style="font-size:13px;"><img src="https://cdn-icons-png.flaticon.com/32/542/542689.png" width="12" height="12" style="margin-right:8px;vertical-align:middle;"><a href="mailto:${email}" style="color:#333;text-decoration:none;">${email}</a></td></tr>
+                ${mobile ? `<tr><td style="font-size:13px;"><img src="https://cdn-icons-png.flaticon.com/32/15/15874.png" width="12" height="12" style="margin-right:8px;vertical-align:middle;">${mobile}</td></tr>` : ''}
+                ${contactInfo}
+            </table></td></tr>
+            <tr><td style="padding:15px 0;"><table cellpadding="0" cellspacing="0" border="0"><tr>
+                <td style="padding-right:8px;"><a href="${personalLi || branch.li}"><img src="https://cdn-icons-png.flaticon.com/32/174/174857.png" width="22" height="22" style="border:0;"></a></td>
+                <td style="padding-right:8px;"><a href="https://facebook.com/${branch.fb}"><img src="https://cdn-icons-png.flaticon.com/32/733/733547.png" width="22" height="22" style="border:0;"></a></td>
+                <td style="padding-right:8px;"><a href="https://instagram.com/${branch.ig}"><img src="https://cdn-icons-png.flaticon.com/32/2111/2111463.png" width="22" height="22" style="border:0;"></a></td>
+                <td><a href="https://tiktok.com/@${branch.tt}"><img src="https://cdn-icons-png.flaticon.com/32/3046/3046121.png" width="22" height="22" style="border:0;"></a></td>
+            </tr></table></td></tr>
+            <tr><td><img src="${banner}" width="450" height="110" style="display:block;border-radius:4px;"></td></tr>
+            <tr><td style="padding-top:15px;"><table cellpadding="0" cellspacing="0" border="0"><tr>${awardHtml}</tr></table></td></tr>
+        </table>`;
         document.getElementById('signature-result').innerHTML = html;
     }
 
-    function openAdmin() {
-        const pw = prompt("Admin Password:");
-        if (pw === "SOR2026") {
-            document.getElementById('overlay').style.display = "block";
-            document.getElementById('admin-panel').style.display = "block";
-            buildAdminUI();
-        }
-    }
-
-    function buildAdminUI() {
-        let html = '';
-        ['mac', 'bv', 'hq'].forEach(sec => {
-            html += `<h3>${sec.toUpperCase()}</h3>`;
-            for (let key in config[sec]) {
-                html += `<div class="admin-row"><label>${key}</label><input type="text" id="admin-${sec}-${key}" value="${config[sec][key]}"></div>`;
-            }
-        });
-        document.getElementById('admin-fields').innerHTML = html;
-    }
-
-    function saveAdmin() {
-        ['mac', 'bv', 'hq'].forEach(sec => {
-            for (let key in config[sec]) {
-                config[sec][key] = document.getElementById(`admin-${sec}-${key}`).value;
-            }
-        });
-        localStorage.setItem('sor_config_v4', JSON.stringify(config));
-        closeAdmin();
-        render();
-    }
-
-    function closeAdmin() {
-        document.getElementById('overlay').style.display = "none";
-        document.getElementById('admin-panel').style.display = "none";
-    }
-
-    document.querySelectorAll('input').forEach(i => i.oninput = render);
-    
-    function copyToClipboard() {
+    function copyVisual() {
         const el = document.getElementById("signature-result");
         const range = document.createRange();
         range.selectNode(el);
         window.getSelection().removeAllRanges();
         window.getSelection().addRange(range);
         document.execCommand("copy");
-        alert("Rockstar Signature Copied!");
+        alert("Copied for Gmail!");
     }
+
+    function copyForHubSpot() {
+        const rawHtml = document.getElementById("signature-result").innerHTML;
+        const minified = rawHtml.replace(/\s+/g, ' ').trim();
+        const el = document.createElement('textarea');
+        el.value = minified;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        alert("Minified HubSpot HTML Copied!");
+    }
+    document.querySelectorAll('input').forEach(i => i.oninput = render);
 </script>
 </body>
 </html>
